@@ -1,0 +1,72 @@
+From b0027e7423a8c1d4d3326621e6940dd2b2a16634 Mon Sep 17 00:00:00 2001
+From: Abel Wu <wuyun.wu@huawei.com>
+Date: Thu, 20 Aug 2020 10:01:26 +1000
+Subject: [PATCH 4/4] mm/slub.c: branch optimization in free slowpath
+
+The two conditions are mutually exclusive and gcc compiler will optimise
+this into if-else-like pattern.  Given that the majority of free_slowpath
+is free_frozen, let's provide some hint to the compilers.
+
+Tests (perf bench sched messaging -g 20 -l 400000, executed 10x
+after reboot) are done and the summarized result:
+
+	un-patched	patched
+max.	192.316		189.851
+min.	187.267		186.252
+avg.	189.154		188.086
+stdev.	1.37		0.99
+
+Link: http://lkml.kernel.org/r/20200813101812.1617-1-wuyun.wu@huawei.com
+Signed-off-by: Abel Wu <wuyun.wu@huawei.com>
+Acked-by: Christoph Lameter <cl@linux.com>
+Cc: Pekka Enberg <penberg@kernel.org>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Cc: Hewenliang <hewenliang4@huawei.com>
+Cc: Hu Shiyuan <hushiyuan@huawei.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ mm/slub.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/mm/slub.c b/mm/slub.c
+index ef303070d175..a6bf7087dfb1 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -2955,20 +2955,21 @@ static void __slab_free(struct kmem_cache *s, struct page *page,
+ 
+ 	if (likely(!n)) {
+ 
+-		/*
+-		 * If we just froze the page then put it onto the
+-		 * per cpu partial list.
+-		 */
+-		if (new.frozen && !was_frozen) {
++		if (likely(was_frozen)) {
++			/*
++			 * The list lock was not taken therefore no list
++			 * activity can be necessary.
++			 */
++			stat(s, FREE_FROZEN);
++		} else if (new.frozen) {
++			/*
++			 * If we just froze the page then put it onto the
++			 * per cpu partial list.
++			 */
+ 			put_cpu_partial(s, page, 1);
+ 			stat(s, CPU_PARTIAL_FREE);
+ 		}
+-		/*
+-		 * The list lock was not taken therefore no list
+-		 * activity can be necessary.
+-		 */
+-		if (was_frozen)
+-			stat(s, FREE_FROZEN);
++
+ 		return;
+ 	}
+ 
+-- 
+2.28.0
+

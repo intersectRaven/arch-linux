@@ -1,0 +1,19 @@
+diff --git a/init/Kconfig b/init/Kconfig
+index 4f717bfdbfe2..5125bcbbe792 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1237,7 +1237,6 @@ config BOOT_CONFIG
+ 
+ choice
+ 	prompt "Compiler optimization level"
+-	default CC_OPTIMIZE_FOR_PERFORMANCE
+ 
+ config CC_OPTIMIZE_FOR_PERFORMANCE
+ 	bool "Optimize for performance (-O2)"
+@@ -1248,7 +1247,6 @@ config CC_OPTIMIZE_FOR_PERFORMANCE
+ 
+ config CC_OPTIMIZE_FOR_PERFORMANCE_O3
+ 	bool "Optimize more for performance (-O3)"
+-	depends on ARC
+ 	help
+ 	  Choosing this option will pass "-O3" to your compiler to optimize
