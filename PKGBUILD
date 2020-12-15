@@ -1,13 +1,13 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.9.14
+pkgver=5.10.1
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
 license=(GPL2)
 makedepends=(
-  bc kmod libelf pahole
+  bc kmod libelf pahole cpio perl tar xz
   xmlto python-sphinx python-sphinx_rtd_theme graphviz imagemagick
   git
 )
@@ -15,7 +15,7 @@ options=('!strip')
 source=(
   'git+https://github.com/intersectRaven/linux.git'
   config         # the main kernel config file
-  sphinx-workaround.patch
+  #sphinx-workaround.patch
   'version_fix.patch'
 )
 validpgpkeys=(
@@ -24,8 +24,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '961bfcd11cfd4110ce4cccc8b295e85f6557457c4de3b6d1649821232e151c5d'
-            '8cb21e0b3411327b627a9dd15b8eb773295a0d2782b1a41b2a8839d1b2f5778c'
+            '89a9983fd24b01bfda8713e4fd8ebf66176d28de3cfbd4539152de20156ab8fd'
             '91f5f9bb6ef9701a8b7e2e6afb7dbca5933936fb000b10a2cfc27056f690a254')
 
 export KBUILD_BUILD_HOST=archlinux
