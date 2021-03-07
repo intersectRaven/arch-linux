@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.11.0
+pkgver=5.11.4
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
