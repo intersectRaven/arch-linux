@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.13.0
+pkgver=5.13.1
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
@@ -24,7 +24,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '22fec99f89de5d0e0af0c106e07ddb715f009c1490439c143f6e92702c3b078e'
+            '8aa50a998deb8f401ede376a397f85849d524cac8586fc668ec77570068055a8'
             '91f5f9bb6ef9701a8b7e2e6afb7dbca5933936fb000b10a2cfc27056f690a254')
 
 export KBUILD_BUILD_HOST=archlinux
