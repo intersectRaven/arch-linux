@@ -1,12 +1,12 @@
 diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index bb709eda96cd..43b5254fe5cd 100755
+index 6b54e46a0f12..b8cad33d0016 100755
 --- a/scripts/setlocalversion
 +++ b/scripts/setlocalversion
-@@ -187,7 +187,6 @@ else
- 	# LOCALVERSION= is not specified
- 	if test "${LOCALVERSION+set}" != "set"; then
- 		scm=$(scm_version --short)
--		res="$res${scm:++}"
- 	fi
+@@ -140,7 +140,6 @@ elif [ "${LOCALVERSION+set}" != "set" ]; then
+ 	# If the variable LOCALVERSION is set (including being set
+ 	# to an empty string), we don't want to append a plus sign.
+ 	scm=$(scm_version --short)
+-	res="$res${scm:++}"
  fi
  
+ echo "$res"
