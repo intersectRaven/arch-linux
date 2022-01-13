@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.15.7
+pkgver=5.16.0
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
@@ -25,7 +25,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '928594976e70c5e85be36387ff0dd5327deb5d2b7a155083c70806c1535cf41c'
+            '902c0ce7395e7a833cd2e42657d88f1656b2d7d36b6367883df811542c3f3e16'
             'a79b2cb924e33e70c83ca6cba2a8424c67cb81381dd87f1cba0f396cba1c0bd3')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -108,11 +108,11 @@ _package-headers() {
   install -Dt "$builddir/arch/x86" -m644 arch/x86/Makefile
   cp -t "$builddir" -a scripts
 
-  # add objtool for external module building and enabled VALIDATION_STACK option
+  # required when STACK_VALIDATION is enabled
   install -Dt "$builddir/tools/objtool" tools/objtool/objtool
 
-  # add xfs and shmem for aufs building
-  mkdir -p "$builddir"/{fs/xfs,mm}
+  # required when DEBUG_INFO_BTF_MODULES is enabled
+  install -Dt "$builddir/tools/bpf/resolve_btfids" tools/bpf/resolve_btfids/resolve_btfids
 
   echo "Installing headers..."
   cp -t "$builddir" -a include
