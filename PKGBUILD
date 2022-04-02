@@ -1,11 +1,12 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.17.0
+pkgver=5.17.1
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
 license=(GPL2)
+BUILDDIR=/home/intersectraven/Sources/arch/linux/tmp
 BUILDENV+=(!ccache)
 makedepends=(
   bc kmod libelf pahole cpio perl tar xz
@@ -25,7 +26,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '3a6817e52872d6a1998b6ee87c4ea0ee1018a32d5b07d9d93c399d52118d7059'
+            'f2792b71b7634c6b61bac1dc83bf37d92fa3644e7ee388a3c07bbd92c1a512fb'
             'a79b2cb924e33e70c83ca6cba2a8424c67cb81381dd87f1cba0f396cba1c0bd3')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -71,7 +72,7 @@ build() {
 _package() {
   pkgdesc="The $pkgdesc kernel and modules"
   depends=(coreutils kmod initramfs)
-  optdepends=('crda: to set the correct wireless channels of your country'
+  optdepends=('wireless-regdb: to set the correct wireless channels of your country'
               'linux-firmware: firmware images needed for some devices')
   provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE)
   replaces=(virtualbox-guest-modules-arch wireguard-arch)
