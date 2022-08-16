@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=5.19.0
+pkgver=5.19.1
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
@@ -25,7 +25,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '12f9d2c04791deb3e7b8e67530bf6cdec6602c6b2833e6a93f41c47b1450e651'
+            '1c1210ac053922fce154566beb40c1cbe8a8f2563982a3f05bb46384bf7dc33c'
             'a79b2cb924e33e70c83ca6cba2a8424c67cb81381dd87f1cba0f396cba1c0bd3')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -65,7 +65,7 @@ prepare() {
 
 build() {
   cd "${srcdir}/linux"
-  make KCFLAGS=-O3 LOCALVERSION= bzImage modules
+  make LOCALVERSION= bzImage modules
 }
 
 _package() {
