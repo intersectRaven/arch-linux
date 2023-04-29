@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.2.13
+pkgver=6.3.0
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
@@ -25,8 +25,8 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            'aa421437f7339b314cea9da4960851706023335f69b548d515e848a84408c6c7'
-            'a79b2cb924e33e70c83ca6cba2a8424c67cb81381dd87f1cba0f396cba1c0bd3')
+            '1a1ba3770d9e0e6eaaa02aeac511752e7fa261caa4f1d5126ec9e6db4e9f51d7'
+            '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -36,7 +36,7 @@ prepare() {
   cd "${srcdir}/linux"
 
   echo "Setting version..."
-  scripts/setlocalversion --save-scmversion
+  #scripts/setlocalversion
   echo "-$pkgrel" > localversion.10-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
 
