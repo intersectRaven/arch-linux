@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.3.0
+pkgver=6.3.1
 pkgrel=77
 pkgdesc='Linux'
 arch=(x86_64)
@@ -9,9 +9,22 @@ license=(GPL2)
 BUILDDIR=/home/intersectraven/Sources/arch/linux/tmp
 BUILDENV+=(!ccache)
 makedepends=(
-  bc libelf pahole cpio perl tar xz
-  xmlto python-sphinx python-sphinx_rtd_theme graphviz imagemagick texlive-latexextra
+  bc
+  cpio
+  gettext
   git
+  libelf
+  pahole
+  perl
+  tar
+  xz
+
+  # htmldocs
+  graphviz
+  imagemagick
+  python-sphinx
+  texlive-latexextra
+  xmlto
 )
 options=('!strip')
 source=(
@@ -25,20 +38,27 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '1a1ba3770d9e0e6eaaa02aeac511752e7fa261caa4f1d5126ec9e6db4e9f51d7'
+            '8cc9eb3c6e2f21177d831bf1e0dd67a24ba771088793c16b95639e2c78c143e0'
             '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
 export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
+_make() {
+  test -s version
+  make KERNELRELEASE="$(<version)" "$@"
+}
+
 prepare() {
   cd "${srcdir}/linux"
 
   echo "Setting version..."
-  #scripts/setlocalversion
   echo "-$pkgrel" > localversion.10-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
+  make defconfig
+  make -s kernelrelease > version
+  make mrproper
 
   local src
   for src in "${source[@]}"; do
@@ -56,40 +76,51 @@ prepare() {
   sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
 
 
-  #make olddefconfig
-  make prepare
+  #_make olddefconfig
+  _make prepare
 
-  make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
 }
 
 build() {
   cd "${srcdir}/linux"
-  make LOCALVERSION= bzImage modules
+  _make LOCALVERSION= bzImage modules
 }
 
 _package() {
   pkgdesc="The $pkgdesc kernel and modules"
-  depends=(coreutils kmod initramfs)
-  optdepends=('wireless-regdb: to set the correct wireless channels of your country'
-              'linux-firmware: firmware images needed for some devices')
-  provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE KSMBD-MODULE)
-  replaces=(virtualbox-guest-modules-arch wireguard-arch)
+  depends=(
+    coreutils
+    initramfs
+    kmod
+  )
+  optdepends=(
+    'wireless-regdb: to set the correct wireless channels of your country'
+    'linux-firmware: firmware images needed for some devices'
+  )
+  provides=(
+    KSMBD-MODULE
+    VIRTUALBOX-GUEST-MODULES
+    WIREGUARD-MODULE
+  )
+  replaces=(
+    virtualbox-guest-modules-arch
+    wireguard-arch
+  )
 
   cd "${srcdir}/linux"
-  local kernver="$(<version)"
-  local modulesdir="$pkgdir/usr/lib/modules/$kernver"
+  local modulesdir="$pkgdir/usr/lib/modules/$(<version)"
 
   echo "Installing boot image..."
   # systemd expects to find the kernel here to allow hibernation
   # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
-  install -Dm644 "$(make -s image_name)" "$modulesdir/vmlinuz"
+  install -Dm644 "$(_make -s image_name)" "$modulesdir/vmlinuz"
 
   # Used by mkinitcpio to name the kernel
   echo "$pkgbase" | install -Dm644 /dev/stdin "$modulesdir/pkgbase"
 
   echo "Installing modules..."
-  make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 \
+  _make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 \
     DEPMOD=/doesnt/exist modules_install  # Suppress depmod
 
   # remove build and source links
@@ -197,8 +228,11 @@ _package-docs() {
   ln -sr "$builddir/Documentation" "$pkgdir/usr/share/doc/$pkgbase"
 }
 
-#pkgname=("$pkgbase" "$pkgbase-headers" "$pkgbase-docs")
-pkgname=("$pkgbase" "$pkgbase-headers")
+pkgname=(
+  "$pkgbase"
+  "$pkgbase-headers"
+  #"$pkgbase-docs"
+)
 for _p in "${pkgname[@]}"; do
   eval "package_$_p() {
     $(declare -f "_package${_p#$pkgbase}")
