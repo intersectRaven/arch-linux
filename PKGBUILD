@@ -1,9 +1,11 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.4.2
+pkgver=6.4.3
 pkgrel=77
 pkgdesc='Linux'
+_srctag=v${pkgver%.*}-${pkgver##*.}
+url="https://github.com/archlinux/linux/commits/$_srctag"
 arch=(x86_64)
 license=(GPL2)
 BUILDDIR=/home/intersectraven/Sources/arch/linux/tmp
@@ -26,6 +28,7 @@ makedepends=(
   texlive-latexextra
 )
 options=('!strip')
+_srcname=linux
 source=(
   'git+https://github.com/intersectRaven/linux.git'
   config         # the main kernel config file
@@ -37,7 +40,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '06ce43502dcf56de9a02031b503237332098eaeb4221278b2ec0e0a086fc1134'
+            'f56a2af8b1dbd893f004cdd267cb4d307ecade826fc4a47c3bbb8d70eb3b7f01'
             '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -50,7 +53,7 @@ _make() {
 }
 
 prepare() {
-  cd "${srcdir}/linux"
+  cd $_srcname
 
   echo "Setting version..."
   echo "-$pkgrel" > localversion.10-pkgrel
@@ -71,18 +74,14 @@ prepare() {
   echo "Setting config..."
   cp ../config .config
 
-  sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"-intersectRaven\"|g" ./.config
-  sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
-
-
-  #_make olddefconfig
-  _make prepare
+  _make olddefconfig
+  diff -u ../config .config || :
 
   echo "Prepared $pkgbase version $(<version)"
 }
 
 build() {
-  cd "${srcdir}/linux"
+  cd $_srcname
   _make LOCALVERSION= bzImage modules
 }
 
@@ -107,7 +106,7 @@ _package() {
     wireguard-arch
   )
 
-  cd "${srcdir}/linux"
+  cd $_srcname
   local modulesdir="$pkgdir/usr/lib/modules/$(<version)"
 
   echo "Installing boot image..."
@@ -130,7 +129,7 @@ _package-headers() {
   pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel"
   depends=(pahole)
 
-  cd "${srcdir}/linux"
+  cd $_srcname
   local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
 
   echo "Installing build files..."
