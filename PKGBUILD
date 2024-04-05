@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.8.1
+pkgver=6.8.4
 pkgrel=77
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -28,7 +28,10 @@ makedepends=(
   python-sphinx
   texlive-latexextra
 )
-options=('!strip')
+options=(
+  !debug
+  !strip
+)
 _srcname=linux
 source=(
   'git+https://github.com/intersectRaven/linux.git'
