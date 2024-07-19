@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.9.6
+pkgver=6.9.10
 pkgrel=77
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -12,10 +12,13 @@ BUILDDIR=/home/intersectraven/Sources/arch/linux/tmp
 BUILDENV+=(!ccache)
 makedepends=(
   bc
+  clang
   cpio
   gettext
   git
   libelf
+  lld
+  llvm
   pahole
   perl
   python
@@ -30,8 +33,16 @@ makedepends=(
 )
 options=(
   !debug
+  !lto
   !strip
 )
+BUILD_FLAGS=(
+  CC=clang
+  LD=ld.lld
+  LLVM=1
+  LLVM_IAS=1
+)
+
 _srcname=linux
 source=(
   'git+https://github.com/intersectRaven/linux.git'
@@ -44,7 +55,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '6461b4259509f4033fd4c74daf3f5559759f6217c68f4bcbc3b35591d36fbb20'
+            '56ed32eb2c51dcd43bb23aab5dc8db62b50e5c6106113ef26da313b5a97fc49c'
             '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -53,7 +64,7 @@ export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EP
 
 _make() {
   test -s version
-  make KERNELRELEASE="$(<version)" "$@"
+  make ${BUILD_FLAGS[*]} KERNELRELEASE="$(<version)" "$@"
 }
 
 prepare() {
@@ -77,6 +88,12 @@ prepare() {
 
   echo "Setting config..."
   cp ../config .config
+
+  echo "Enabling kCFI"
+  echo scripts/config -e ARCH_SUPPORTS_CFI_CLANG \
+  echo    -e CFI_CLANG
+
+  scripts/config -e LTO -e LTO_CLANG -e ARCH_SUPPORTS_LTO_CLANG -e ARCH_SUPPORTS_LTO_CLANG_THIN -d LTO_NONE -e HAS_LTO_CLANG -e LTO_CLANG_FULL -d LTO_CLANG_THIN -e HAVE_GCC_PLUGINS
 
   _make olddefconfig
   diff -u ../config .config || :
