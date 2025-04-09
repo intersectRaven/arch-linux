@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.13.8
+pkgver=6.14.1
 pkgrel=77
 pkgdesc='Linux'
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -58,7 +58,7 @@ validpgpkeys=(
   'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
 )
 sha256sums=('SKIP'
-            '3d6f60002872616eab54eb3a97cdee4e86a2374b39e2f936e5b1a70dd325b40e'
+            'a004c5fe6f5a552cad86c37ca0977342016c6d294bcba096f4242dbbd33445a6'
             '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
 
 export KBUILD_BUILD_HOST=archlinux
@@ -124,6 +124,7 @@ _package() {
   )
   provides=(
     KSMBD-MODULE
+    NTSYNC-MODULE
     VIRTUALBOX-GUEST-MODULES
     WIREGUARD-MODULE
   )
