@@ -4,10 +4,9 @@ pkgbase=linux
 pkgver=6.17.5
 pkgrel=77
 pkgdesc='Linux'
-_srctag=v${pkgver%.*}-${pkgver##*.}
-url="https://github.com/archlinux/linux/commits/$_srctag"
+url='https://github.com/archlinux/linux'
 arch=(x86_64)
-license=(GPL2)
+license=(GPL-2.0-only)
 BUILDDIR=/home/intersectraven/Sources/arch/linux/tmp
 makedepends=(
   bc
@@ -36,38 +35,38 @@ makedepends=(
 )
 options=(
   !debug
-  !lto
   !strip
 )
 BUILD_FLAGS=(
   CC=clang
+  KCFLAGS='-mno-sse4a'
   LD=ld.lld
   LLVM=1
   LLVM_IAS=1
 )
-
 _srcname=linux
+_srctag=v${pkgver%.*}-${pkgver##*.}
 source=(
-  'git+https://github.com/intersectRaven/linux.git'
-  config         # the main kernel config file
-  version_fix.patch
+  git+https://github.com/intersectRaven/linux.git
+  config  # the main kernel config file
 )
 validpgpkeys=(
-  'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
-  '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman
-  'A2FF3A36AAA56654109064AB19802F8B0D70FC30'  # Jan Alexander Steffens (heftig)
+  ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
+  647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
+  83BC8889351B5DEBBB68416EB8AC08600F108CDF  # Jan Alexander Steffens (heftig)
 )
+# https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
 sha256sums=('SKIP'
-            '780d6eb90542bdc5cdba59a83c51ea8c5372f67df122be1d35db075188441ba5'
-            '9626843fe125450a71b889a6088d246cd58804875e4b45005bcee5cbb7027379')
+            '07340c964f2f5de6986edf241e73578b79064a0c070782835c090943374c3164')
+b2sums=('SKIP'
+        'ab02d7b3d1610cf49d6e9774f426fe777a26f3957577c81ea9c6bb12f901ee2b26b4d1ec83e9b503d996ba23c4bf6ac7fd3a7465c21ee02c63d618d65688c5b7')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
 export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 _make() {
-  test -s version
-  make ${BUILD_FLAGS[*]} KERNELRELEASE="$(<version)" "$@"
+  make ${BUILD_FLAGS[*]} "$@"
 }
 
 prepare() {
@@ -76,14 +75,12 @@ prepare() {
   echo "Setting version..."
   echo "-$pkgrel" > localversion.10-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
-  make defconfig
-  make -s kernelrelease > version
-  make mrproper
 
   local src
   for src in "${source[@]}"; do
     src="${src%%::*}"
     src="${src##*/}"
+    src="${src%.zst}"
     [[ $src = *.patch ]] || continue
     echo "Applying patch $src..."
     patch -Np1 < "../$src"
@@ -101,13 +98,15 @@ prepare() {
   _make olddefconfig
   diff -u ../config .config || :
 
+  _make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
 }
 
 build() {
   cd $_srcname
-  _make LOCALVERSION= bzImage modules
-  make -C tools/bpf/bpftool vmlinux.h feature-clang-bpf-co-re=1
+  _make all
+  _make -C tools/bpf/bpftool vmlinux.h feature-clang-bpf-co-re=1
+  # _make htmldocs SPHINXOPTS=-QT
 }
 
 _package() {
@@ -148,7 +147,7 @@ _package() {
   ZSTD_CLEVEL=19 _make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 \
     DEPMOD=/doesnt/exist modules_install  # Suppress depmod
 
-  # remove build links
+  # remove build link
   rm "$modulesdir"/build
 }
 
@@ -196,11 +195,11 @@ _package-headers() {
   find . -name 'Kconfig*' -exec install -Dm644 {} "$builddir/{}" \;
 
   echo "Installing Rust files..."
-  #install -Dt "$builddir/rust" -m644 rust/*.rmeta
-  #install -Dt "$builddir/rust" rust/*.so
+  install -Dt "$builddir/rust" -m644 rust/*.rmeta
+  install -Dt "$builddir/rust" rust/*.so
 
   echo "Installing unstripped VDSO..."
-  make INSTALL_MOD_PATH="$pkgdir/usr" vdso_install \
+  _make INSTALL_MOD_PATH="$pkgdir/usr" vdso_install \
     link=  # Suppress build-id symlinks
 
   echo "Removing unneeded architectures..."
@@ -265,7 +264,7 @@ _package-docs() {
 pkgname=(
   "$pkgbase"
   "$pkgbase-headers"
-  #"$pkgbase-docs"
+  # "$pkgbase-docs"
 )
 for _p in "${pkgname[@]}"; do
   eval "package_$_p() {
