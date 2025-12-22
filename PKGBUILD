@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.18.0
+pkgver=6.18.2
 pkgrel=77
 pkgdesc='Linux'
 url='https://github.com/archlinux/linux'
