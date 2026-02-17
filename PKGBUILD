@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=6.19.0
+pkgver=6.19.2
 pkgrel=77
 pkgdesc='Linux'
 url='https://github.com/archlinux/linux'
@@ -57,9 +57,9 @@ validpgpkeys=(
 )
 # https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
 sha256sums=('SKIP'
-            '1c8c7e7746db808a257983ed468caaa07ca35512794ad26ef37d05c2fe4f6523')
+            'e3ceddd569fcd0e748c69970fe17ae44b8359efebb0a2e3e80e3da4cd8ff5ead')
 b2sums=('SKIP'
-        '92ab65a56e6c875a822730b44f0026595e9f008f0302a2e1e586b039578a8d662a4e2dd9bb8e9addbae2a754f82d11ae7b6468d429979c3c2206a4be80a3b587')
+        'adab5698854d0e23b3f8964d7c13b52ccd58ca8a425a9410f5dc95c54add6951b9b6f16845dabf5d2dcdc75f612993e31d5fc9b9d0e874a27fd7977b824ced05')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
