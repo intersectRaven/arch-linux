@@ -1,7 +1,7 @@
 # Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
 
 pkgbase=linux
-pkgver=7.0.2
+pkgver=7.0.6
 pkgrel=77
 pkgdesc='Linux'
 url='https://github.com/archlinux/linux'
@@ -38,11 +38,7 @@ options=(
   !strip
 )
 BUILD_FLAGS=(
-  CC=clang
-  KCFLAGS='-mno-sse4a'
-  LD=ld.lld
   LLVM=1
-  LLVM_IAS=1
 )
 _srcname=linux
 _srctag=v${pkgver%.*}-${pkgver##*.}
@@ -57,9 +53,9 @@ validpgpkeys=(
 )
 # https://www.kernel.org/pub/linux/kernel/v6.x/sha256sums.asc
 sha256sums=('SKIP'
-            '39e5208edf0c606896f89f046c1a07e573a44f23e2a27177a9f0029f50fe2a6c')
+            '4a0cc777a19d05eea74780717b29d90b784fa88583deb877e6f7a3b705eb3e65')
 b2sums=('SKIP'
-        'a1943c35767689c40af012e96e07de7f3d2e9bf96725f85d4d016040042bd7bca892fd5c31582c3af307e63f0f2f8824cbdbaeb219e145317a48e83fbecf1d78')
+        'cf72c9e5e503bb4c2c4453504941692549300540fd6711f17b06b3b4d780e492b16f67a1e69e649454991dd5152fd87a8449894f74f9b8d407d8c91af47a839e')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
